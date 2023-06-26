@@ -81,6 +81,20 @@ export function PlanManagerForm(props) {
         onSubmit(data)
     }
 
+    const formatCurrency = (inputValue) => {
+        // Remover caracteres não numéricos, exceto o ponto decimal
+        const numericValue = String(Number(inputValue.replace(/[^0-9]/g, '')));
+
+        let cents = numericValue.slice(-2);
+        const integer = numericValue.substr(0, numericValue.length - 2)
+
+        if (cents.length === 1) {
+            cents = `0${cents}`
+        }
+
+        return `${integer || "0"},${cents || "00"}`;
+    };
+
     return (
         <Formik
             enableReinitialize
@@ -107,17 +121,24 @@ export function PlanManagerForm(props) {
                             />
                         </Grid>
                         <Grid xs={12} sm={6} md={4} item>
-                            <Field
-                                as={TextField}
-                                label="Valor"
-                                name="value"
-                                variant="outlined"
-                                className={classes.fullWidth}
-                                margin="dense"
-                                type="text"
-                            />
-
-
+                            <Field name="value">
+                                {({ field, form }) => (
+                                    <TextField 
+                                        label="Valor"
+                                        variant="outlined"
+                                        className={classes.fullWidth}
+                                        margin="dense"
+                                        type="text"
+                                        {...field}
+                                        onChange={(data) => {
+                                            form.setValues({
+                                                ...form.values,
+                                                value: formatCurrency(data.target.value)
+                                            })
+                                        }}
+                                    />
+                                )}
+                            </Field>
                         </Grid>
                         <Grid xs={12} sm={6} md={4} item>
                             <Field
@@ -260,7 +281,7 @@ export default function PlansManager() {
             name: data.name,
             queues: data.queues,
             users: data.users,
-            value: data.value.replace(",", ".")
+            value: Number(data.value.replace(",", "."))
         }
         setLoading(true)
         try {

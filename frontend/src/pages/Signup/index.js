@@ -24,24 +24,25 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import logo from "../../assets/zapsimples.png";
+
 import { i18n } from "../../translate/i18n";
 
 import { openApi } from "../../services/api";
 import toastError from "../../errors/toastError";
 import moment from "moment";
-// const Copyright = () => {
-// 	return (
-// 		<Typography variant="body2" color="textSecondary" align="center">
-// 			{"Copyleft "}
-// 			<Link color="inherit" href="https://github.com/canove">
-// 				Canove
-// 			</Link>{" "}
-// 			{new Date().getFullYear()}
-// 			{"."}
-// 		</Typography>
-// 	);
-// };
+import logo from "../../assets/logo.png";
+ const Copyright = () => {
+ 	return (
+ 		<Typography variant="body2" color="textSecondary" align="center">
+ 			{"Copyright © "}
+ 			<Link color="inherit" href="https://www.instagram.com/multiconversa/">
+ 				Multiconversa
+ 			</Link>{" "}
+			{new Date().getFullYear()}
+ 			{"."}
+ 		</Typography>
+ 	);
+ };
 
 const useStyles = makeStyles(theme => ({
 	paper: {
@@ -65,11 +66,11 @@ const useStyles = makeStyles(theme => ({
 
 const UserSchema = Yup.object().shape({
 	name: Yup.string()
-		.min(2, "Too Short!")
-		.max(50, "Too Long!")
-		.required("Required"),
-	password: Yup.string().min(5, "Too Short!").max(50, "Too Long!"),
-	email: Yup.string().email("Invalid email").required("Required"),
+		.min(2, "Muito curto!")
+		.max(50, "Muito longo!")
+		.required("Obrigatório"),
+	password: Yup.string().min(5, "Muito curto!").max(50, "Muito longo!"),
+	email: Yup.string().email("Email inválido").required("Obrigatório"),
 });
 
 const SignUp = () => {
@@ -82,15 +83,15 @@ const SignUp = () => {
 		companyId = params.companyId
 	}
 
-	const initialState = { name: "", email: "", password: "", planId: "", };
+	const initialState = { name: "", email: "", phone: "", password: "", planId: "", };
 
 	const [user] = useState(initialState);
-	const dueDate = moment().add(3, "day").format();
+	const dueDate = moment().add(1, "day").format();
 	const handleSignUp = async values => {
 		Object.assign(values, { recurrence: "MENSAL" });
 		Object.assign(values, { dueDate: dueDate });
 		Object.assign(values, { status: "t" });
-		Object.assign(values, { campaignsEnabled: true });
+		Object.assign(values, { campaignsEnabled: false });
 		try {
 			await openApi.post("/companies/cadastro", values);
 			toast.success(i18n.t("signup.toasts.success"));
@@ -118,11 +119,11 @@ const SignUp = () => {
 			<CssBaseline />
 			<div className={classes.paper}>
 				<div>
-					<img style={{ margin: "0 auto", height: "80px", width: "100%" }} src={logo} alt="Whats" />
+					<center><img style={{ margin: "0 auto", width: "70%" }} src={logo} alt="Logocadastro" /></center>
 				</div>
-				{/*<Typography component="h1" variant="h5">
+				<Typography component="h1" variant="h5">
 					{i18n.t("signup.title")}
-				</Typography>*/}
+				</Typography>
 				{/* <form className={classes.form} noValidate onSubmit={handleSignUp}> */}
 				<Formik
 					initialValues={user}
@@ -149,6 +150,7 @@ const SignUp = () => {
 										fullWidth
 										id="name"
 										label="Nome da Empresa"
+										required
 									/>
 								</Grid>
 
@@ -166,7 +168,23 @@ const SignUp = () => {
 										required
 									/>
 								</Grid>
+								
 								<Grid item xs={12}>
+									<Field
+										as={TextField}
+										variant="outlined"
+										fullWidth
+										id="phone"
+										label="Telefone com (DDD)"
+										name="phone"
+										error={touched.email && Boolean(errors.email)}
+										helperText={touched.email && errors.email}
+										autoComplete="phone"
+										required
+									/>
+								</Grid>
+								
+								 <Grid item xs={12}>
 									<Field
 										as={TextField}
 										variant="outlined"
@@ -181,6 +199,7 @@ const SignUp = () => {
 										required
 									/>
 								</Grid>
+								
 								<Grid item xs={12}>
 									<InputLabel htmlFor="plan-selection">Plano</InputLabel>
 									<Field
@@ -225,7 +244,7 @@ const SignUp = () => {
 					)}
 				</Formik>
 			</div>
-			<Box mt={5}>{/* <Copyright /> */}</Box>
+			<Box mt={5}>{ <Copyright /> }</Box>
 		</Container>
 	);
 };

@@ -81,6 +81,16 @@ export function ChatModal({
 
   const handleSave = async () => {
     try {
+      if (!title) {
+        alert("Por favor, preencha o título da conversa.");
+        return;
+      }
+
+      if (!users || users.length === 0) {
+        alert("Por favor, selecione pelo menos um usuário.");
+        return;
+      }
+
       if (type === "edit") {
         await api.put(`/chats/${chat.id}`, {
           users,
@@ -95,7 +105,7 @@ export function ChatModal({
       }
       handleClose();
     } catch (err) {}
-  };
+  };  
 
   return (
     <Dialog

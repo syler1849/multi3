@@ -1,5 +1,4 @@
 import { WAMessage } from "@whiskeysockets/baileys";
-import WALegacySocket from "@whiskeysockets/baileys"
 import * as Sentry from "@sentry/node";
 import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
@@ -25,6 +24,18 @@ const SendWhatsAppMessage = async ({
     ticket.isGroup ? "g.us" : "s.whatsapp.net"
   }`;
   if (quotedMsg) {
+    if (wbot.type === "legacy") {
+      const chatMessages = await (wbot as any).loadMessageFromWA(
+        number,
+        quotedMsg.id
+      );
+
+      options = {
+        quoted: chatMessages
+      };
+    }
+
+    if (wbot.type === "md") {
       const chatMessages = await Message.findOne({
         where: {
           id: quotedMsg.id
@@ -44,7 +55,7 @@ const SendWhatsAppMessage = async ({
         };
       }
       console.log(chatMessages)
-    
+    }
   }
 
   try {

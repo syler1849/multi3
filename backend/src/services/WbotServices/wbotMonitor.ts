@@ -1,5 +1,4 @@
 import {
-  WASocket,
   BinaryNode,
   Contact as BContact,
 } from "@whiskeysockets/baileys";
@@ -16,7 +15,7 @@ import { logger } from "../../utils/logger";
 import createOrUpdateBaileysService from "../BaileysServices/CreateOrUpdateBaileysService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 
-type Session = WASocket & {
+type Session = any & {
   id?: number;
   store?: Store;
 };
@@ -87,7 +86,7 @@ const wbotMonitor = async (
           await ticket.update({
             lastMessage: body,
           });
-          
+
 
           if(ticket.status === "closed") {
             await ticket.update({
@@ -108,6 +107,9 @@ const wbotMonitor = async (
       });
     });
 
+    wbot.ev.on("contacts.set", async (contacts: IContact) => {
+      console.log("set", contacts);
+    });
   } catch (err) {
     Sentry.captureException(err);
     logger.error(err);

@@ -14,7 +14,7 @@ import Container from "@material-ui/core/Container";
 import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
-import logo from "../../assets/zapsimples.png";
+import logo from "../../assets/logo.png";
 
 
 // const Copyright = () => {
@@ -71,11 +71,11 @@ const Login = () => {
 			<CssBaseline />
 			<div className={classes.paper}>
 				<div>
-					<img style={{ margin: "0 auto", height: "80px", width: "100%" }} src={logo} alt="Whats" />
+					<center><img style={{ margin: "0 auto", width: "70%" }} src={logo} alt="logologin" /></center>
 				</div>
-				{/*<Typography component="h1" variant="h5">
+				<Typography component="h1" variant="h5">
 					{i18n.t("login.title")}
-				</Typography>*/}
+				</Typography>
 				<form className={classes.form} noValidate onSubmit={handlSubmit}>
 					<TextField
 						variant="outlined"
