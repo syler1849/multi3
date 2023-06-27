@@ -26,7 +26,6 @@ import announcementRoutes from "./announcementRoutes";
 import chatRoutes from "./chatRoutes";
 import invoiceRoutes from "./invoicesRoutes";
 import subscriptionRoutes from "./subScriptionRoutes";
-import webHookMetaRoutes from "./WebHookMetaRoutes";
 
 const routes = Router();
 
@@ -57,7 +56,6 @@ routes.use(announcementRoutes);
 routes.use(chatRoutes);
 routes.use(subscriptionRoutes);
 routes.use(invoiceRoutes);
-routes.use("/webhook/fb", webHookMetaRoutes);
 
 
 export default routes;

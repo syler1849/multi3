@@ -13,7 +13,7 @@ import FindOrCreateATicketTrakingService from "./FindOrCreateATicketTrakingServi
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import { verifyMessage } from "../WbotServices/wbotMessageListener";
 import { isNil } from "lodash";
-import sendFaceMessage from "../FacebookServices/sendFacebookMessage";
+import Whatsapp from "../../models/Whatsapp";
 
 interface TicketData {
   status?: string;
@@ -21,7 +21,6 @@ interface TicketData {
   queueId?: number | null;
   chatbot?: boolean;
   queueOptionId?: number;
-  justClose?: boolean;
 }
 
 interface Request {
@@ -41,8 +40,9 @@ const UpdateTicketService = async ({
   ticketId,
   companyId
 }: Request): Promise<Response> => {
+
   try {
-    const { status, justClose } = ticketData;
+    const { status } = ticketData;
     let { queueId, userId } = ticketData;
     let chatbot: boolean | null = ticketData.chatbot || false;
     let queueOptionId: number | null = ticketData.queueOptionId || null;
@@ -64,9 +64,7 @@ const UpdateTicketService = async ({
       whatsappId: ticket.whatsappId
     });
 
-    if (ticket.channel === "whatsapp") {
-      SetTicketMessagesAsRead(ticket);
-    }
+    await SetTicketMessagesAsRead(ticket);
 
     const oldStatus = ticket.status;
     const oldUserId = ticket.user?.id;
@@ -85,22 +83,12 @@ const UpdateTicketService = async ({
       );
 
       if (setting?.value === "enabled") {
-        if (ticketTraking.ratingAt == null && !justClose) {
-
-
+        if (ticketTraking.ratingAt == null) {
           const ratingTxt = ratingMessage || "";
           let bodyRatingMessage = `\u200e${ratingTxt}\n\n`;
           bodyRatingMessage +=
             "Digite de 1 à 3 para qualificar nosso atendimento:\n*1* - _Insatisfeito_\n*2* - _Satisfeito_\n*3* - _Muito Satisfeito_\n\n";
-
-          if (ticket.channel === "whatsapp") {
-            await SendWhatsAppMessage({ body: bodyRatingMessage, ticket });
-          }
-
-          if (["facebook", "instagram"].includes(ticket.channel)) {
-            console.log(`Checking if ${ticket.contact.number} is a valid ${ticket.channel} contact`)
-            await sendFaceMessage({ body: bodyRatingMessage, ticket });
-          }
+          await SendWhatsAppMessage({ body: bodyRatingMessage, ticket });
 
           await ticketTraking.update({
             ratingAt: moment().toDate()
@@ -121,47 +109,39 @@ const UpdateTicketService = async ({
 
       if (!isNil(complationMessage) && complationMessage !== "") {
         const body = `\u200e${complationMessage}`;
-        if (ticket.channel === "whatsapp") {
-          await SendWhatsAppMessage({ body, ticket });
-        }
-
-        if (["facebook", "instagram"].includes(ticket.channel)) {
-          console.log(`Checking if ${ticket.contact.number} is a valid ${ticket.channel} contact`)
-          await sendFaceMessage({ body, ticket });
-        }
+        await SendWhatsAppMessage({ body, ticket });
       }
-
+      
       ticketTraking.finishedAt = moment().toDate();
       ticketTraking.whatsappId = ticket.whatsappId;
       ticketTraking.userId = ticket.userId;
-
-      queueId = null;
-      userId = null;
+      
+/*    queueId = null;
+      userId = null; */
     }
-
+    
     if (queueId !== undefined && queueId !== null) {
       ticketTraking.queuedAt = moment().toDate();
     }
 
     if (oldQueueId !== queueId && !isNil(oldQueueId) && !isNil(queueId)) {
       const queue = await Queue.findByPk(queueId);
-      if (ticket.channel === "whatsapp") {
-        const wbot = await GetTicketWbot(ticket);
+      let body = `\u200e${queue?.greetingMessage}`;
+      const wbot = await GetTicketWbot(ticket);
 
-        const queueChangedMessage = await wbot.sendMessage(
-          `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"
-          }`,
-          {
-            text: "\u200eVocê foi transferido, em breve iremos iniciar seu atendimento."
-          }
-        );
-        await verifyMessage(queueChangedMessage, ticket, ticket.contact);
-      }
+      const queueChangedMessage = await wbot.sendMessage(
+        `${ticket.contact.number}@${
+          ticket.isGroup ? "g.us" : "s.whatsapp.net"
+        }`,
+        {
+          text: "\u200eVocê foi transferido, em breve iremos iniciar seu atendimento."
+        }
+      );
+      await verifyMessage(queueChangedMessage, ticket, ticket.contact);
 
-      if (["facebook", "instagram"].includes(ticket.channel)) {
-        console.log(`Checking if ${ticket.contact.number} is a valid ${ticket.channel} contact`)
-        await sendFaceMessage({ body: "\u200eVocê foi transferido, em breve iremos iniciar seu atendimento.", ticket });
-      }
+      // mensagem padrão desativada em caso de troca de fila
+      // const sentMessage = await wbot.sendMessage(`${ticket.contact.number}@c.us`, body);
+      // await verifyMessage(sentMessage, ticket, ticket.contact, companyId);
     }
 
     await ticket.update({
@@ -182,10 +162,6 @@ const UpdateTicketService = async ({
         startedAt: null,
         userId: null
       });
-      io.emit(`company-${companyId}-ticket`, {
-        action: "removeFromList",
-        ticketId: ticket?.id
-      });
     }
 
     if (status !== undefined && ["open"].indexOf(status) > -1) {
@@ -196,27 +172,16 @@ const UpdateTicketService = async ({
         whatsappId: ticket.whatsappId,
         userId: ticket.userId
       });
-      io.emit(`company-${companyId}-ticket`, {
-        action: "removeFromList",
-        ticketId: ticket?.id
-      });
     }
 
     await ticketTraking.save();
 
-    if (justClose && status == 'closed') {
-      io.emit(`company-${companyId}-ticket`, {
-        action: "removeFromList",
-        ticketId: ticket?.id
+    if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
+      io.to(oldStatus).emit(`company-${companyId}-ticket`, {
+        action: "delete",
+        ticketId: ticket.id
       });
-
-    } else
-      if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
-        io.to(oldStatus).emit(`company-${companyId}-ticket`, {
-          action: "delete",
-          ticketId: ticket.id
-        });
-      }
+    }
 
     io.to(ticket.status)
       .to("notification")

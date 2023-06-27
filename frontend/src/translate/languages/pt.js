@@ -292,6 +292,8 @@ const messages = {
           "Nenhum atendimento encontrado com esse status ou termo pesquisado",
         buttons: {
           accept: "Aceitar",
+          closed: "Finalizar",
+          reopen: "Reabrir"
         },
       },
       newTicketModal: {
@@ -307,7 +309,7 @@ const messages = {
         listItems: {
           dashboard: "Dashboard",
           connections: "Conexões",
-          tickets: "Conversas",
+          tickets: "Atendimentos",
           quickMessages: "Respostas Rápidas",
           contacts: "Contatos",
           queues: "Filas & Chatbot",
@@ -660,8 +662,7 @@ const messages = {
           placeholder: "Insira aqui a informação que deseja registrar",
         },
         confirmationModal: {
-          title: "Deletar o ticket ",
-          titleFrom: "do contato ",
+          title: "Deletar o ticket do contato",
           message:
             "Atenção! Todas as mensagens relacionadas ao ticket serão perdidas.",
         },

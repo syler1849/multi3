@@ -191,7 +191,7 @@ const NotificationsPopOver = () => {
   };
 
   return (
-    <div style={{ display: "none" }}>
+    <>
       <IconButton
         onClick={handleClick}
         ref={anchorEl}
@@ -232,7 +232,7 @@ const NotificationsPopOver = () => {
           )}
         </List>
       </Popover>
-    </div>
+    </>
   );
 };
 

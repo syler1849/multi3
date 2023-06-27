@@ -109,7 +109,7 @@ const Ticket = () => {
       }
 
       if (data.action === "delete") {
-        toast.success("Ticket deletado com sucesso!");
+        toast.success("Ticket deleted sucessfully.");
         history.push("/tickets");
       }
     });
@@ -158,7 +158,7 @@ const Ticket = () => {
           ticketId={ticket.id}
           isGroup={ticket.isGroup}
         ></MessagesList>
-        {ticket.status !== "closed" && <MessageInput ticketId={ticket.id} ticketStatus={ticket.status} />}
+        <MessageInput ticketId={ticket.id} ticketStatus={ticket.status} />
       </>
     );
   };

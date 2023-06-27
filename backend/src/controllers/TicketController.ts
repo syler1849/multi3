@@ -27,7 +27,6 @@ interface TicketData {
   status: string;
   queueId: number;
   userId: number;
-  justClose: boolean;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -75,9 +74,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     userId,
     queueIds,
     withUnreadMessages,
-    companyId
-  });
+    companyId,
 
+
+  });
   return res.status(200).json({ tickets, count, hasMore });
 };
 
@@ -98,7 +98,6 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     action: "update",
     ticket
   });
-
   return res.status(200).json(ticket);
 };
 
@@ -107,7 +106,6 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
 
   const contact = await ShowTicketService(ticketId, companyId);
-
   return res.status(200).json(contact);
 };
 
@@ -135,6 +133,7 @@ export const update = async (
     ticketId,
     companyId
   });
+
 
   return res.status(200).json(ticket);
 };

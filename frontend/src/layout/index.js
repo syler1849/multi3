@@ -29,7 +29,7 @@ import { i18n } from "../translate/i18n";
 import toastError from "../errors/toastError";
 import AnnouncementsPopover from "../components/AnnouncementsPopover";
 
-import logo from "../assets/logo.png";
+import logo from "../assets/zapsimples.png";
 import { socketConnection } from "../services/socket";
 import ChatPopover from "../pages/Chat/ChatPopover";
 
@@ -46,6 +46,8 @@ const useStyles = makeStyles((theme) => ({
 
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
+    color: "#FFFFFF",
+    background: theme.barraSuperior.primary.main,
   },
   toolbarIcon: {
     display: "flex",
@@ -80,6 +82,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 14,
   },
   drawerPaper: {
+    backgroundColor: theme.barraLateral.primary.main,
     position: "relative",
     whiteSpace: "nowrap",
     width: drawerWidth,
@@ -224,7 +227,7 @@ const LoggedInLayout = ({ children }) => {
         open={drawerOpen}
       >
         <div className={classes.toolbarIcon}>
-          <img src={logo} style={{ margin: "0 auto", width: "70%" }} alt="logodash" />
+          <img src={logo} style={{ margin: "0 auto", height: "50px", width: "100%" }} alt="logo" />
           <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
             <ChevronLeftIcon />
           </IconButton>
@@ -259,9 +262,9 @@ const LoggedInLayout = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography
-            component="h1"
-            variant="h6"
-            color="#ffffff"
+            component="h8"
+            variant="h8"
+            color="#FFFFFF"
             noWrap
             className={classes.title}
           >

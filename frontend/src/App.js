@@ -16,15 +16,32 @@ const App = () => {
           height: '8px',
         },
         '&::-webkit-scrollbar-thumb': {
-          boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
-          backgroundColor: '#e8e8e8',
+          boxShadow: 'inset 0 0 6px rgba(170, 0, 126, 126)',
+          backgroundColor: '#2DDD7F',
         },
       },
       palette: {
-        primary: { main: '#28A71A' },
-        danger: { main: '#525252' },
+        primary: { main: "#2DDD7F" },
+        third: { main: "#d17308" }
       },
-    },
+
+      barraSuperior: {
+        primary: { main: "linear-gradient(to right, #2DDD7F, #2DDD7F , #2DDD7F)" },
+        secondary: { main: "#ffffff" },
+      },
+
+      barraLateral: {
+        primary: { main: "#ffffff" },
+      },
+
+      icons: {
+        primary: { main: "#2DDD7F" }
+      },
+      textColorMenu: {
+        primary: { main: "#000000" },
+        secondary: { main: "#2DDD7F" }
+      
+      },    },
     locale
   );
 

@@ -32,13 +32,7 @@ class Plan extends Model<Plan> {
   queues: number;
 
   @Column
-  get value() {
-    return this.getDataValue('value') as any / 100 as any;
-  }
-
-  set value(value: string) {
-    this.setDataValue('value', Math.round(value as any * 100) as any);
-  }
+  value: number;
 
   @CreatedAt
   createdAt: Date;
